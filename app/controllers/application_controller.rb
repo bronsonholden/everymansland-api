@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::API
   rescue_from RailsParam::InvalidParameterError, with: :render_errors
+  rescue_from ActiveRecord::RecordNotFound, with: :not_found
 
   protected
 
@@ -14,5 +15,11 @@ class ApplicationController < ActionController::API
     render json: {
       errors: Array.wrap(error).map(&:message)
     }, status: :unprocessable_entity
+  end
+
+  def not_found(error)
+    render json: {
+      errors: ["Record not found"]
+    }, status: :not_found
   end
 end
