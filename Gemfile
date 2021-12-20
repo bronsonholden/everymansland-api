@@ -16,7 +16,7 @@ gem "puma", "~> 5.0"
 gem "rack-cors"
 gem "rails_param"
 gem "rgeo-geojson"
-gem "rubyfit", git: "https://github.com/paulholden2/rubyfit.git", branch: "develop"
+gem "rubyfit", git: "https://github.com/everymansland/rubyfit.git", branch: "develop"
 gem "shrine", "~> 3.0"
 
 group :development, :test do
