@@ -11,7 +11,7 @@ class Activity::BuildFromFit < ApplicationService
     parser = RubyFit::FitParser.new(self)
     parser.parse(@io)
 
-    generate_critical_power([
+    generate_power_curve([
       1.second,
       2.seconds,
       5.seconds,
@@ -121,7 +121,7 @@ class Activity::BuildFromFit < ApplicationService
     end
   end
 
-  def generate_critical_power(steps)
+  def generate_power_curve(steps)
     profile = @records.map do |record|
       {
         t: (record[:timestamp] - @activity.started_at).to_i,
