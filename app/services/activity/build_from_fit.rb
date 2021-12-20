@@ -11,7 +11,14 @@ class Activity::BuildFromFit < ApplicationService
     parser = RubyFit::FitParser.new(self)
     parser.parse(@io)
 
-    generate_power_curve([
+    power_profile = @records.map do |record|
+      {
+        t: (record[:timestamp] - @activity.started_at).to_i,
+        power: record[:power] || 0
+      }
+    end
+
+    @activity.critical_power = PowerCurve::Calculate.perform(power_profile, [
       1.second,
       2.seconds,
       5.seconds,
@@ -119,63 +126,5 @@ class Activity::BuildFromFit < ApplicationService
     when 1 # standing
       @rider_position = :standing
     end
-  end
-
-  def generate_power_curve(steps)
-    profile = @records.map do |record|
-      {
-        t: (record[:timestamp] - @activity.started_at).to_i,
-        power: record[:power] || 0
-      }
-    end
-
-    profile.inject(0) do |t, moment|
-      moment[:dt] = moment[:t] - t
-      moment[:t]
-    end
-
-    peaks = Hash.new
-    steps.each do |t|
-      peaks[t] = get_power_peaks(t, profile)
-    end
-
-    @activity.critical_power = peaks.compact.to_a
-  end
-
-  # Walk through the power profile, getting average power for all ranges
-  # that match the given duration. The timestamp resolution for FIT files is
-  # seconds, so we can check for exact duration. Whenever the range is
-  # greater than the duration (due perhaps to gaps in record data, or more
-  # likely a pause in the activity), we walk the left edge up until the
-  # range's duration is below the target duration
-  def get_power_peaks(duration, profile)
-    return nil if profile.last[:t] < duration
-    return profile.map { |p| p[:power] }.max if duration == 1
-
-    right = 1
-    t = 0
-    left = 0
-    max = 0
-    power = 0
-
-    while right < profile.size
-      current = profile[right]
-      t += current[:dt]
-      power += current[:power]
-      while t > duration
-        t -= profile[left][:dt]
-        power -= profile[left][:power]
-        left += 1
-      end
-      if t == duration
-        avg = power.to_f / (right - left + 1)
-        if avg > max
-          max = avg
-        end
-      end
-      right += 1
-    end
-
-    max.ceil
   end
 end
