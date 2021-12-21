@@ -62,6 +62,6 @@ class PowerCurve::Calculate < ApplicationService
       right += 1
     end
 
-    max.ceil
+    max.round
   end
 end
