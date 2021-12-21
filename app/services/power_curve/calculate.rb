@@ -48,7 +48,7 @@ class PowerCurve::Calculate < ApplicationService
         left += 1
       end
       if t == duration
-        avg = power.to_f / (right - left + 1)
+        avg = power.to_f / duration
         if avg > max
           max = avg
         end
