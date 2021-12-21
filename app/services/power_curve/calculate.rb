@@ -6,6 +6,7 @@ class PowerCurve::Calculate < ApplicationService
     @durations = durations
     # Calculation is simpler if we have timestep from last reading
     @profile = profile.dup
+    @profile.unshift({t: 0, power: 0}) unless @profile.first[:t].zero?
     @profile.inject(0) do |t, moment|
       moment[:dt] = moment[:t] - t
       moment[:t]
@@ -33,7 +34,7 @@ class PowerCurve::Calculate < ApplicationService
 
     right = 1
     t = 0
-    left = 0
+    left = 1
     max = 0
     power = 0
 
