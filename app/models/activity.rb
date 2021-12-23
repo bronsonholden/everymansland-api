@@ -10,16 +10,16 @@ class Activity < ApplicationRecord
 
   validates :sport, presence: true
   validates :started_at, presence: true
-  validate :critical_power_shape
+  validate :power_curve_shape
 
   belongs_to :condition, optional: true
   has_many :snapshots, dependent: :delete_all
 
-  # Self-joins to unnest the critical power array. Duration and power are
-  # aliased as `peak.duration` and `peak.power` respectively, allowing
-  #  aggregates e.g. `group("peak.duration").maximum("peak.power")` for best
-  # critical power.
-  scope :unnest_critical_power, -> {
+  # Self-joins to unnest the power curve array. Reading duration and power are
+  # aliased as `reading.duration` and `reading.power` respectively, allowing
+  # aggregates e.g. `group("reading.duration").maximum("reading.power")`
+  # for best critical power.
+  scope :unnest_power_curve, -> {
     select("activities.*")
     .joins(
       <<-SQL
@@ -28,19 +28,19 @@ class Activity < ApplicationRecord
           from
           activities as inner_activities,
             unnest(
-              inner_activities.critical_power[:][1:1],
-              inner_activities.critical_power[:][2:2]
+              inner_activities.power_curve[:][1:1],
+              inner_activities.power_curve[:][2:2]
             ) as x(duration, power)
-        ) as peak on peak.id = activities.id
+        ) as reading on reading.id = activities.id
       SQL
     )
   }
 
   private
 
-  def critical_power_shape
-    unless critical_power.is_a?(Array) && critical_power.all? { |p| p.is_a?(Array) && p.all? { |v| v.is_a?(Integer) } }
-      errors.add(:critical_power, "must be an array of duration and power arrays")
+  def power_curve_shape
+    unless power_curve.is_a?(Array) && power_curve.all? { |p| p.is_a?(Array) && p.all? { |v| v.is_a?(Integer) } }
+      errors.add(:power_curve, "must be an array of duration and power arrays")
     end
   end
 end

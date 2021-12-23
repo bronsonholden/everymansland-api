@@ -18,7 +18,7 @@ class Activity::BuildFromFit < ApplicationService
       }
     end
 
-    @activity.critical_power = PowerCurve::Calculate.perform(power_profile, [
+    @activity.power_curve = PowerCurve::Calculate.perform(power_profile, [
       1.second,
       2.seconds,
       5.seconds,
