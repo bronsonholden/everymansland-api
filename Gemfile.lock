@@ -110,6 +110,7 @@ GEM
       activesupport (>= 5)
     i18n (1.8.11)
       concurrent-ruby (~> 1.0)
+    jwt (2.3.0)
     launchy (2.5.0)
       addressable (~> 2.7)
     letter_opener (1.7.0)
@@ -257,6 +258,7 @@ DEPENDENCIES
   factory_bot_rails
   faker
   groupdate
+  jwt
   letter_opener
   listen (~> 3.3)
   pg (~> 1.1)

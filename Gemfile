@@ -11,6 +11,7 @@ gem "bootsnap", ">= 1.4.4", require: false
 gem "blueprinter", "~> 0.25.3"
 gem "delayed_job_active_record"
 gem "groupdate"
+gem "jwt"
 gem "pg", "~> 1.1"
 gem "puma", "~> 5.0"
 gem "rack-cors"
