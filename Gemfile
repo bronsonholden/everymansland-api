@@ -21,6 +21,7 @@ gem "shrine", "~> 3.0"
 
 group :development, :test do
   gem "byebug", platforms: [:mri, :mingw, :x64_mingw]
+  gem "database_cleaner-active_record"
   gem "factory_bot_rails"
   gem "faker"
   gem "rspec-rails"
