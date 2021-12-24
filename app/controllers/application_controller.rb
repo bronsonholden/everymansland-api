@@ -1,4 +1,8 @@
 class ApplicationController < ActionController::API
+  def self.rescue_from(*args, **opts, &block)
+    super(*args, **opts, &block) if Rails.env.production?
+  end
+
   rescue_from RailsParam::InvalidParameterError, with: :render_errors
   rescue_from ActiveRecord::RecordNotFound, with: :not_found
 
