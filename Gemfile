@@ -10,6 +10,7 @@ gem "bcrypt", "~> 3.1.7"
 gem "bootsnap", ">= 1.4.4", require: false
 gem "blueprinter", "~> 0.25.3"
 gem "delayed_job_active_record"
+gem "fastimage"
 gem "groupdate"
 gem "jwt"
 gem "pg", "~> 1.1"
