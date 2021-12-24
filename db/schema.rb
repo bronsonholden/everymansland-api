@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_23_221434) do
+ActiveRecord::Schema.define(version: 2021_12_24_024950) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -24,6 +24,12 @@ ActiveRecord::Schema.define(version: 2021_12_23_221434) do
     t.datetime "updated_at", precision: 6, null: false
     t.integer "power_curve", array: true
     t.index ["condition_id"], name: "index_activities_on_condition_id"
+  end
+
+  create_table "blacklist_tokens", force: :cascade do |t|
+    t.string "jti", null: false
+    t.datetime "exp", null: false
+    t.index ["jti"], name: "index_blacklist_tokens_on_jti"
   end
 
   create_table "conditions", force: :cascade do |t|
@@ -48,6 +54,16 @@ ActiveRecord::Schema.define(version: 2021_12_23_221434) do
     t.index ["priority", "run_at"], name: "delayed_jobs_priority"
   end
 
+  create_table "refresh_tokens", force: :cascade do |t|
+    t.string "token", null: false
+    t.datetime "expires_at", null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["token"], name: "index_refresh_tokens_on_token", unique: true
+    t.index ["user_id"], name: "index_refresh_tokens_on_user_id"
+  end
+
   create_table "snapshots", force: :cascade do |t|
     t.bigint "activity_id", null: false
     t.integer "heart_rate"
@@ -67,6 +83,20 @@ ActiveRecord::Schema.define(version: 2021_12_23_221434) do
     t.index ["activity_id"], name: "index_snapshots_on_activity_id"
   end
 
+  create_table "users", force: :cascade do |t|
+    t.string "first_name", null: false
+    t.string "last_name", null: false
+    t.string "email", null: false
+    t.string "password_digest"
+    t.string "confirmation_token"
+    t.text "avatar_data"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
+    t.index ["email"], name: "index_users_on_email", unique: true
+  end
+
   add_foreign_key "activities", "conditions"
+  add_foreign_key "refresh_tokens", "users"
   add_foreign_key "snapshots", "activities"
 end

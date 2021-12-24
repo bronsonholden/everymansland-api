@@ -20,3 +20,6 @@ else
 end
 
 Shrine.plugin :activerecord
+Shrine.plugin :store_dimensions
+Shrine.plugin :validation_helpers
+Shrine.plugin :determine_mime_type
