@@ -39,3 +39,5 @@ jobs:
         env:
           RAILS_ENV: test
           SECRET_KEY_BASE: deadbeef
+          JWT_SIGNING_KEY: ${{ secrets.JWT_SIGNING_KEY }}
+          JWT_ENCRYPTION_KEY: ${{ secrets.JWT_ENCRYPTION_KEY }}
