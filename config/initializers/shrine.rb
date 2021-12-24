@@ -14,8 +14,8 @@ if Rails.env.production?
   }
 else
   Shrine.storages = {
-    cache: Shrine::Storage::FileSystem.new("public", prefix: "uploads/cache"),
-    store: Shrine::Storage::FileSystem.new("public", prefix: "uploads/store")
+    cache: Shrine::Storage::FileSystem.new("storage", prefix: "#{Rails.env}/uploads/cache"),
+    store: Shrine::Storage::FileSystem.new("storage", prefix: "#{Rails.env}/uploads/store")
   }
 end
 
