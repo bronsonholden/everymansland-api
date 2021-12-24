@@ -11,36 +11,6 @@ class User < ApplicationRecord
   validates_presence_of :password_confirmation, if: :will_save_change_to_password_digest?
   validates :email, presence: true, uniqueness: true
 
-  class NoAuthenticationProvided < StandardError
-    def message
-      "No authentication provided"
-    end
-  end
-
-  class InvalidRefreshToken < StandardError
-    def message
-      "Invalid refresh token"
-    end
-  end
-
-  class InvalidAccessToken < StandardError
-    def message
-      "Invalid access token"
-    end
-  end
-
-  class IncorrectPassword < StandardError
-    def message
-      "Incorrect password"
-    end
-  end
-
-  class InvalidEmail < StandardError
-    def message
-      "Invalid email address"
-    end
-  end
-
   def confirmation_url
     return unless confirmation_token?
     # TODO
