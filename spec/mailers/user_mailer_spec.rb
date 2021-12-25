@@ -1,6 +1,4 @@
-require "rails_helper"
-
-RSpec.describe UserMailer, type: :mailer do
+describe UserMailer, type: :mailer do
   let(:user) { build :user, confirmation_token: "abc" }
   let(:mail) { described_class.invite(user) }
 
