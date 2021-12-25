@@ -15,7 +15,9 @@ Rails.application.routes.draw do
   end
 
   resource :session, controller: :session, only: %w[create update destroy]
-  resources :users
+  resources :users do
+    get :activities, to: "activities#index", as: :activities
+  end
   resource :user, controller: :authenticated_user, only: %w[show update] do
     resource :avatar, controller: :avatar, only: %w[show update]
   end

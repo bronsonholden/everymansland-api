@@ -16,8 +16,11 @@ class ActivitiesController < ApplicationController
     param! :page, Integer, min: 1, default: 1
     param! :limit, Integer, min: 1, max: 100, default: 25, message: "limit must be between 1 and 100 inclusively"
 
-    activities = Activity
-      .all
+    user_id = path_params.permit(:user_id).fetch(:user_id, nil)
+
+    activities = Activity.all
+    activities = activities.where(user_id: user_id) unless user_id.nil?
+    activities = activities
       .order({:"#{params[:sort]}" => params[:direction].to_sym})
       .offset((params[:page] - 1) * params[:limit])
     activities = activities.send(params[:sport].to_sym) if params[:sport].present?
