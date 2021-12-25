@@ -40,20 +40,20 @@ class Numeric
   alias to_cup to_cups
 
   def lbs
-    self / LBS_PER_KG
+    to_f / LBS_PER_KG
   end
 
   def mi
-    self / MI_PER_KM
+    to_f / MI_PER_KM
   end
   alias mph mi
 
   def yd
-    self / (MI_PER_KM * YD_PER_MI)
+    to_f / (MI_PER_KM * YD_PER_MI)
   end
 
   def ft
-    self / (MI_PER_KM * YD_PER_MI * FT_PER_YD)
+    to_f / (MI_PER_KM * YD_PER_MI * FT_PER_YD)
   end
 
   def km
@@ -61,7 +61,7 @@ class Numeric
   end
 
   def m
-    self / 1000
+    to_f / 1000
   end
 
   def kg
@@ -73,11 +73,11 @@ class Numeric
   end
 
   def kJ
-    self / KJ_PER_KCAL
+    to_f / KJ_PER_KCAL
   end
 
   def cups
-    self / CUP_PER_L
+    to_f / CUP_PER_L
   end
   alias cup cups
 
