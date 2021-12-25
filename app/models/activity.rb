@@ -14,6 +14,7 @@ class Activity < ApplicationRecord
 
   belongs_to :condition, optional: true
   has_many :snapshots, dependent: :delete_all
+  belongs_to :user
 
   # Self-joins to unnest the power curve array. Reading duration and power are
   # aliased as `reading.duration` and `reading.power` respectively, allowing

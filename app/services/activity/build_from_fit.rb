@@ -1,9 +1,10 @@
 class Activity::BuildFromFit < ApplicationService
   attr_reader :activity
 
-  def initialize(io)
+  def initialize(user, io)
+    @user = user
     @io = io
-    @activity = Activity.new(started_at: Time.now)
+    @activity = Activity.new(started_at: Time.now, user: user)
     @records = []
   end
 
