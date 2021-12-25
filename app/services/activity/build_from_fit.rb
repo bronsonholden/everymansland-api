@@ -80,7 +80,7 @@ class Activity::BuildFromFit < ApplicationService
       raw_data: msg,
       rider_position: @rider_position,
       power: msg["power"],
-      altitude: msg.fetch_by("altitude", &:m), # meters above sealevel
+      altitude: msg["altitude"],
       cumulative_distance: msg.fetch_by("distance", &:m), # meters
       heart_rate: msg["heart_rate"],
       speed: msg["speed"] * 3.6, # meters per second
