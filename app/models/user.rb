@@ -5,6 +5,8 @@ class User < ApplicationRecord
   after_create :send_invite
 
   has_many :refresh_tokens
+  belongs_to :condition
+  accepts_nested_attributes_for :condition
 
   has_secure_password validations: false
   validates_confirmation_of :password, if: :password_digest_changed?

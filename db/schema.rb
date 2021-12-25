@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_24_024950) do
+ActiveRecord::Schema.define(version: 2021_12_25_013045) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -92,6 +92,8 @@ ActiveRecord::Schema.define(version: 2021_12_24_024950) do
     t.text "avatar_data"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "condition_id", null: false
+    t.index ["condition_id"], name: "index_users_on_condition_id"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
   end
@@ -99,4 +101,5 @@ ActiveRecord::Schema.define(version: 2021_12_24_024950) do
   add_foreign_key "activities", "conditions"
   add_foreign_key "refresh_tokens", "users"
   add_foreign_key "snapshots", "activities"
+  add_foreign_key "users", "conditions"
 end
