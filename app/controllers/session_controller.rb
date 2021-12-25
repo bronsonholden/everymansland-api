@@ -6,7 +6,9 @@ class SessionController < ApplicationController
   def create
     user = User.find_by(email: session_params[:email])
     raise UnauthorizedError.new("Invalid email") unless user.present?
-    raise UnauthorizedError.new("Incorrect password") unless user.authenticate(session_params[:password])
+    unless user.password_digest? && user.authenticate(session_params[:password])
+      raise UnauthorizedError.new("Incorrect password")
+    end
 
     RefreshToken.where(user: user).delete_all
     token = SecureRandom.hex(32)
