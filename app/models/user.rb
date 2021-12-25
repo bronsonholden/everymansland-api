@@ -5,7 +5,7 @@ class User < ApplicationRecord
   before_create :set_confirmation_token, unless: :confirmation_token?
   after_create :send_invite
 
-  has_many :refresh_tokens
+  has_many :refresh_tokens, dependent: :destroy
   belongs_to :condition
   accepts_nested_attributes_for :condition
 
