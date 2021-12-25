@@ -1,5 +1,5 @@
 class Activity < ApplicationRecord
-  include FitConstants
+  include FitConstants::Sport[]
 
   SUPPORTED_SPORT_TYPES = %i[
     cycling

@@ -1,5 +1,6 @@
 class User < ApplicationRecord
   include AvatarUploader::Attachment(:avatar)
+  include FitConstants::Gender[:sex]
 
   before_create :set_confirmation_token, unless: :confirmation_token?
   after_create :send_invite
