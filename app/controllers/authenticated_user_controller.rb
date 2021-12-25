@@ -6,14 +6,6 @@ class AuthenticatedUserController < ApplicationController
   end
 
   def update
-    param! :first_name, String
-    param! :last_name, String
-    param! :height, Integer, min: 1
-    param! :sex, String, in: %w[female male]
-    param! :condition, Hash do |condition|
-      condition.param! :weight, Float, min: 0
-    end
-
     current_user.update({
       first_name: user_params[:first_name],
       height: user_params[:height],
