@@ -3,6 +3,8 @@ class Condition < ApplicationRecord
   validates :weight, presence: true, numericality: {greater_than: 0}
   validates :cycling_ftp, numericality: {greater_than: 0}, allow_nil: true
 
+  has_one :activity
+
   def cycling_wkg
     cycling_ftp / weight unless cycling_ftp.nil?
   end
