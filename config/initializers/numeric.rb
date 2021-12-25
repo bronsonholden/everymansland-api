@@ -1,17 +1,5 @@
-# EML stores data in the following units, without exception:
-#  - Weight (kg)
-#  - Distance (km)
-#  - Power (W)
-#  - Speed (kmph)
-#  - Cadence (rpm)
-#  - Fluid volume (L)
-#  - Energy (kcal)
-#  - Temperature (C)
-#  - Heart rate (bpm)
-#  - Duration (s)
-#
-# Imperial conversions are monkeypatched for simplicity and code readability.
-# Be careful when chain calling these...
+# Conversions are monkeypatched for simplicity and code readability. Be
+# careful when chain calling these...
 
 LBS_PER_KG = 2.20462
 MI_PER_KM = 0.621371
