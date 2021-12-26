@@ -25,7 +25,7 @@ class AuthenticatedUserController < ApplicationController
       :height,
       :last_name,
       :sex,
-      condition: [:weight]
+      condition: [:weight, :cycling_ftp]
     )
   end
 end
