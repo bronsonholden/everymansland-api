@@ -5,9 +5,9 @@ class SessionController < ApplicationController
 
   def create
     user = User.find_by(email: session_params[:email])
-    raise UnauthorizedError.new("Invalid email") unless user.present?
+    raise ApplicationError.new("Invalid email", :unauthorized) unless user.present?
     unless user.password_digest? && user.authenticate(session_params[:password])
-      raise UnauthorizedError.new("Incorrect password")
+      raise ApplicationError.new("Incorrect password", :unauthorized)
     end
 
     RefreshToken.where(user: user).delete_all
@@ -29,7 +29,7 @@ class SessionController < ApplicationController
         :refresh_token,
         domain: cookie_domain
       )
-      raise UnauthorizedError.new("Invalid refresh token")
+      raise ApplicationError.new("Invalid refresh token", :unauthorized)
     end
 
     set_refresh_token_cookie(refresh_token.token)

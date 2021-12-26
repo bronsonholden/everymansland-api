@@ -1,11 +1,15 @@
 class ApplicationError < StandardError
-  attr_reader :message
+  attr_reader :messages, :status
 
-  def initialize(message)
-    @message = message
+  def initialize(messages, status = :internal_server_error)
+    @messages = messages
+    @status = status
   end
 
-  def status
-    :internal_server_error
+  def inspect
+    code = Rack::Utils.status_code(status)
+    desc = Rack::Utils::HTTP_STATUS_CODES[code]
+    text = Array.wrap(messages).to_sentence
+    "#<ApplicationError: (#{code} #{desc}): #{text}>"
   end
 end

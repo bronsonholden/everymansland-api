@@ -7,7 +7,4 @@ class ApplicationRecord < ActiveRecord::Base
       @message = message
     end
   end
-
-  class UnauthorizedError < ApplicationError; end
-  class NotFoundError < ApplicationError; end
 end
