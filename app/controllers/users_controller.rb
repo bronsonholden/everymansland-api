@@ -1,10 +1,15 @@
 class UsersController < ApplicationController
   def index
-    nyi!
+    users = User.all
+
+    render json: {
+      count: users.size,
+      users: UserBlueprint.render_as_hash(users)
+    }, status: :ok
   end
 
   def show
-    nyi!
+    render json: {users: UserBlueprint.render_as_hash(User.find(params[:id]))}, status: :ok
   end
 
   def create
