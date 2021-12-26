@@ -6,7 +6,7 @@ class AuthenticatedUserController < ApplicationController
   end
 
   def update
-    current_user.update({
+    current_user.update!({
       first_name: user_params[:first_name],
       height: user_params[:height],
       last_name: user_params[:last_name],
