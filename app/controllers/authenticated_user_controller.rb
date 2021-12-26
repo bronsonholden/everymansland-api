@@ -6,14 +6,11 @@ class AuthenticatedUserController < ApplicationController
   end
 
   def update
-    current_user.update!({
-      first_name: user_params[:first_name],
-      height: user_params[:height],
-      last_name: user_params[:last_name],
-      sex: user_params[:sex],
-      condition_attributes: user_params[:condition].to_h,
-    }.compact_blank)
+    data = user_params.to_h.tap do |hash|
+      hash[:condition_attributes] = hash.delete :condition
+    end.compact_blank
 
+    current_user.update!(data)
     head :ok
   end
 
