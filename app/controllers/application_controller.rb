@@ -5,6 +5,9 @@ class ApplicationController < ActionController::API
 
   rescue_from StandardError, with: :render_errors
   rescue_from RailsParam::InvalidParameterError, with: :render_errors
+  rescue_from ActiveRecord::RecordInvalid do |error|
+    application_error(UnprocessableEntityError.new(error.record.errors.to_a))
+  end
   rescue_from ActiveRecord::RecordNotFound do |error|
     application_error(NotFoundError.new("#{error.model} not found"))
   end
@@ -55,26 +58,13 @@ class ApplicationController < ActionController::API
 
   def render_errors(error)
     render json: {
-      errors: Array.wrap(error).map(&:message)
+      errors: Array.wrap(error.message)
     }, status: :unprocessable_entity
   end
 
   def application_error(error)
-    errors = Array.wrap(error)
     render json: {
-      errors: errors.map(&:message)
-    }, status: errors.first.status
-  end
-
-  def not_found(error)
-    render json: {
-      errors: ["Record not found"]
-    }, status: :not_found
-  end
-
-  def unauthorized(error)
-    render json: {
-      errors: Array.wrap(error).map(&:message)
-    }, status: :unauthorized
+      errors: Array.wrap(error.message)
+    }, status: error.status
   end
 end
