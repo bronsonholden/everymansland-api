@@ -18,16 +18,22 @@ class ActivitiesController < ApplicationController
 
     user_id = path_params.permit(:user_id).fetch(:user_id, nil)
 
-    activities = Activity.all
-    activities = activities.where(user_id: user_id) unless user_id.nil?
-    activities = activities
-      .order({:"#{params[:sort]}" => params[:direction].to_sym})
-      .offset((params[:page] - 1) * params[:limit])
-    activities = activities.send(params[:sport].to_sym) if params[:sport].present?
+    base_scope = if user_id.present?
+      User.find(user_id).activities
+    else
+      Activity.all
+    end
+
+    scope = base_scope
+    scope.where!(user_id: params[:user_id]) if params[:user_id].present?
+    scope.where!(sport: params[:sport]) if params[:sport].present?
+    scope.order!({:"#{params[:sort]}" => params[:direction].to_sym})
+    scope.offset!((params[:page] - 1) * params[:limit])
+    scope.limit!(params[:limit].to_i)
 
     render json: {
-      activities: ActivityBlueprint.render_as_hash(activities.limit(params[:limit])),
-      count: Activity.all.count,
+      activities: ActivityBlueprint.render_as_hash(scope),
+      count: base_scope.count,
       page: params[:page]
     }, status: :ok
   end
