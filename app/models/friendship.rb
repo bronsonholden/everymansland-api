@@ -36,6 +36,10 @@ class Friendship < ApplicationRecord
     reciprocal.first_or_create
   end
 
+  def accept!
+    reciprocal.first_or_create!
+  end
+
   def reciprocal
     Friendship.where(friend: user, user: friend)
   end
@@ -44,6 +48,13 @@ class Friendship < ApplicationRecord
     Friendship.transaction do
       self.destroy
       reciprocal.destroy_all
+    end
+  end
+
+  def self.makeup(user, friend)
+    Friendship.transaction do
+      friendship = Friendship.create(user: user, friend: friend)
+      friendship && !!friendship.accept
     end
   end
 end
