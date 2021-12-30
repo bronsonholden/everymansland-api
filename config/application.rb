@@ -36,6 +36,7 @@ module EveryMansLand
 
     config.action_dispatch.rescue_responses.merge!({
       "ApplicationError" => :internal_server_error,
+      "ForbiddenError" => :forbidden,
       "NotFoundError" => :not_found,
       "UnauthorizedError" => :unauthorized,
       "UnprocessableEntityError" => :unprocessable_entity
