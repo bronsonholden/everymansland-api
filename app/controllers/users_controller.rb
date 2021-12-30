@@ -2,14 +2,17 @@ class UsersController < ApplicationController
   def index
     users = User.all
 
-    render json: {
-      total: users.size,
-      users: UserBlueprint.render_as_hash(users)
-    }, status: :ok
+    render json: serialize_collection(users), status: :ok
   end
 
   def show
-    render json: {users: UserBlueprint.render_as_hash(User.find(params[:id]))}, status: :ok
+    user = begin
+      User.find(params[:id])
+    rescue ActiveRecord::RecordNotFound
+      raise NotFoundError.with(User, :id, params[:id])
+    end
+
+    render json: UserBlueprint.render_as_hash(user), status: :ok
   end
 
   def create
