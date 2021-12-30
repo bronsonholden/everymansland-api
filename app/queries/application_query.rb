@@ -14,21 +14,25 @@
 # and there's no paging applied to keep them decoupled from controllers,
 # making them more easily tested and more portable.
 class ApplicationQuery
-  def initialize(params, context)
-    @params = params
-    @context = context
+  class << self
+    attr_accessor :declared_params, :declared_context
   end
 
-  def self.exec(params = {}, context = {})
+  def initialize(params, context)
+    @params = params || {}
+    @context = context || {}
+  end
+
+  def self.exec(params, context)
     new(params, context).exec
   end
 
   def self.param(name, type, options = {})
-    (@@declared_params ||= []) << {name: name, type: type, options: options}
+    (self.declared_params ||= []) << {name: name, type: type, options: options}
   end
 
   def self.context(name, type, options = {})
-    (@@declared_context ||= []) << {name: name, type: type, options: options}
+    (self.declared_context ||= []) << {name: name, type: type, options: options}
   end
 
   def exec
@@ -44,15 +48,15 @@ class ApplicationQuery
   private
 
   def params!
-    result = @params.slice(*@@declared_params.map { |param| param[:name] })
-    @@declared_params.each do |param|
+    result = @params.slice(*self.class.declared_params.map { |param| param[:name] })
+    self.class.declared_params.each do |param|
       Parameter::Validate.perform(result, param[:name], param[:type], param[:options])
     end
     result
   end
 
   def context!
-    @@declared_context.each do |ctx|
+    self.class.declared_context.each do |ctx|
       Parameter::Validate.perform(@context, ctx[:name], ctx[:type], ctx[:options])
     end
     @context
