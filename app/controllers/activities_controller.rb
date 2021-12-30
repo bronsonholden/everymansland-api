@@ -21,11 +21,7 @@ class ActivitiesController < ApplicationController
       for_user: nil
     })
 
-    render json: {
-      activities: ActivityBlueprint.render_as_hash(scope),
-      total: scope.count,
-      page: 1,
-    }.compact, status: :ok
+    render json: serialize_collection(scope), status: :ok
   end
 
   def show
@@ -42,10 +38,14 @@ class ActivitiesController < ApplicationController
       for_activity: @activity
     })
 
-    render json: {
-      snapshots: SnapshotBlueprint.render_as_hash(snapshots, view: @activity.sport),
-      total: snapshots.count
-    }, status: :ok
+    # Snapshots are cursor-paged, so we only need to apply limit
+    paging = params.permit!.to_h.symbolize_keys.slice(:limit)
+    Parameter::Validate.perform(paging, :limit, Integer, range: (1..100), default: 25)
+
+    render json: serialize_collection(
+      snapshots.limit(paging[:limit]),
+      paged: false
+    ), status: :ok
   end
 
   private

@@ -1,5 +1,5 @@
 class Snapshot::List < ApplicationQuery
-  param :t, Integer, range: (0..), default: 0
+  param :t, Integer, range: (-1..)
   context :current_user, User, required: true
   context :for_activity, Activity, required: true
 
@@ -12,6 +12,6 @@ class Snapshot::List < ApplicationQuery
       raise ForbiddenError.no_permission("view this activity")
     end
 
-    for_activity.snapshots.where("t >= ?", params[:t])
+    for_activity.snapshots.where("t > ?", params[:t])
   end
 end

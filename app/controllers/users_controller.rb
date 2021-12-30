@@ -37,10 +37,6 @@ class UsersController < ApplicationController
       for_user: user
     })
 
-    render json: {
-      activities: ActivityBlueprint.render_as_hash(scope),
-      total: scope.count,
-      page: 1,
-    }.compact, status: :ok
+    render json: serialize_collection(scope), status: :ok
   end
 end

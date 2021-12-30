@@ -25,6 +25,29 @@ class ApplicationController < ActionController::API
     raise UnauthorizedError.new("Invalid access token") if @current_user.nil?
   end
 
+  def serialize_collection(scope, paged: true)
+    scope = if paged
+      paging = params.permit!.to_h.symbolize_keys.slice(:page, :limit)
+      Parameter::Validate.perform(paging, :page, Integer, range: (1..), default: 1)
+      Parameter::Validate.perform(paging, :limit, Integer, range: (1..100), default: 25)
+      scope.offset((paging[:page] - 1) * paging[:limit]).limit(paging[:limit])
+    else
+      scope
+    end
+
+    blueprint = begin
+      "#{scope.model.to_s}Blueprint".constantize
+    rescue NameError
+      raise ApplicationError.new("No blueprint found for serialization")
+    end
+
+    {
+      "#{scope.table_name}": blueprint.render_as_hash(scope),
+      total: scope.offset(nil).limit(nil).count,
+      page: (paging[:page] if paged)
+    }.compact
+  end
+
   private
 
   def jwt!
