@@ -1,5 +1,6 @@
 class ActivitiesController < ApplicationController
   before_action :set_activity, only: %i[destroy show update snapshots]
+  before_action :authenticate_user!, only: [:create, :destroy, :snapshots]
 
   def create
     nyi!
@@ -36,18 +37,14 @@ class ActivitiesController < ApplicationController
   end
 
   def snapshots
-    param! :limit, Integer, min: 1, max: 100, default: 25, message: "limit must be between 1 and 100 inclusively"
-    param! :t, Integer, min: 0, default: 0
-
-    snapshots = @activity
-      .snapshots
-      .where("t >= ?", params[:t])
-      .order(t: :asc)
-      .limit(params[:limit])
+    snapshots = Snapshot::List.exec(query_params!, {
+      current_user: current_user,
+      for_activity: @activity
+    })
 
     render json: {
-      total: @activity.snapshots.count,
-      snapshots: SnapshotBlueprint.render_as_hash(snapshots, view: @activity.sport)
+      snapshots: SnapshotBlueprint.render_as_hash(snapshots, view: @activity.sport),
+      total: snapshots.count
     }, status: :ok
   end
 
