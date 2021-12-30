@@ -56,10 +56,11 @@ class ApplicationQuery
   end
 
   def context!
+    result = @context.slice(*self.class.declared_context.map { |param| param[:name] })
     self.class.declared_context.each do |ctx|
-      Parameter::Validate.perform(@context, ctx[:name], ctx[:type], ctx[:options])
+      Parameter::Validate.perform(result, ctx[:name], ctx[:type], ctx[:options])
     end
-    @context
+    result
   rescue UnprocessableEntityError => e
     fail ApplicationError.new("Invalid query context provided: #{e.message}")
   end
