@@ -9,7 +9,7 @@ describe Activity::List do
   context "user for self" do
     let(:context) do
       {
-        requesting_user: user,
+        current_user: user,
         for_user: user
       }
     end
@@ -21,7 +21,7 @@ describe Activity::List do
     let(:friend) { create :user }
     let(:context) do
       {
-        requesting_user: friend,
+        current_user: friend,
         for_user: user
       }
     end
@@ -37,7 +37,7 @@ describe Activity::List do
     let(:other_user) { create :user }
     let(:context) do
       {
-        requesting_user: other_user,
+        current_user: other_user,
         for_user: user
       }
     end
@@ -49,7 +49,7 @@ describe Activity::List do
     let(:other_user) { create :user }
     let(:context) do
       {
-        requesting_user: other_user,
+        current_user: other_user,
         for_user: nil
       }
     end
@@ -60,7 +60,7 @@ describe Activity::List do
   context "anonymous for user" do
     let(:context) do
       {
-        requesting_user: nil,
+        current_user: nil,
         for_user: user
       }
     end
@@ -71,7 +71,7 @@ describe Activity::List do
   context "anonymous for anyone" do
     let(:context) do
       {
-        requesting_user: nil,
+        current_user: nil,
         for_user: nil
       }
     end

@@ -16,7 +16,7 @@ class AuthenticatedUserController < ApplicationController
 
   def activities
     scope = Activity::List.exec(query_params!, {
-      requesting_user: current_user,
+      current_user: current_user,
       for_user: current_user
     })
 
