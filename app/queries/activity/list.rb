@@ -1,0 +1,31 @@
+class Activity::List < ApplicationQuery
+  param :sort, String, in: %w[created_at started_at], default: "created_at"
+  param :direction, String, in: %w[asc desc], default: "asc"
+  param :sport, String, in: Activity::SUPPORTED_SPORT_TYPES.map(&:to_s)
+  context :requesting_user, User
+  context :for_user, User
+
+  def resolve(params, context)
+    requesting_user = context[:requesting_user]
+    for_user = context[:for_user]
+
+    scope = if requesting_user.present?
+      # Users can see friends' activities that are not hidden
+      Activity
+        .not_hidden
+        .where(user: requesting_user.friends)
+        .or(Activity.published)
+        # Users can always see all of their activities
+        .or(Activity.where(user: requesting_user))
+    else
+      # Guests can only see published activities
+      Activity.published
+    end
+
+    scope = scope.where({
+      user: for_user,
+      sport: params[:sport]
+    }.compact)
+    scope = scope.order(:"#{params[:sort]}" => params[:direction])
+  end
+end

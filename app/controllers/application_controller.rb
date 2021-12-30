@@ -5,15 +5,13 @@ class ApplicationController < ActionController::API
 
   protected
 
-  # I don't understand why these don't exist by default
-  def path_params
-    @path_params ||= ActionController::Parameters.new(request.path_parameters)
+  def query_params!
+    ActionController::Parameters.new(request.query_parameters)
+      .permit!
+      .to_h
+      .symbolize_keys
+      .except(:page, :limit)
   end
-
-  def query_params
-    @query_params ||= ActionController::Parameters.new(request.query_parameters)
-  end
-  # ¯\_(ツ)_/¯
 
   def nyi!
     response.set_header("Cache-Control", "no-cache")

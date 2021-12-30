@@ -3,7 +3,7 @@ class UsersController < ApplicationController
     users = User.all
 
     render json: {
-      count: users.size,
+      total: users.size,
       users: UserBlueprint.render_as_hash(users)
     }, status: :ok
   end
@@ -18,5 +18,29 @@ class UsersController < ApplicationController
 
   def update
     nyi!
+  end
+
+  def activities
+    begin
+      authenticate_user!
+    rescue UnauthorizedError
+    end
+
+    user = begin
+      User.find(params[:id])
+    rescue ActiveRecord::RecordNotFound => e
+      raise NotFoundError.with(User, :id, user_id)
+    end
+
+    scope = Activity::List.exec(query_params!, {
+      requesting_user: current_user,
+      for_user: user
+    })
+
+    render json: {
+      activities: ActivityBlueprint.render_as_hash(scope),
+      total: scope.count,
+      page: 1,
+    }.compact, status: :ok
   end
 end

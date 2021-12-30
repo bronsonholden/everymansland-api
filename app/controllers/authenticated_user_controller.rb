@@ -14,6 +14,19 @@ class AuthenticatedUserController < ApplicationController
     head :ok
   end
 
+  def activities
+    scope = Activity::List.exec(query_params!, {
+      requesting_user: current_user,
+      for_user: current_user
+    })
+
+    render json: {
+      activities: ActivityBlueprint.render_as_hash(scope),
+      total: scope.count,
+      page: 1,
+    }.compact, status: :ok
+  end
+
   private
 
   def user_params
