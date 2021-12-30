@@ -8,6 +8,8 @@ class Activity < ApplicationRecord
     fishing
   ].freeze
 
+  enum visibility: %i[hidden shared published]
+
   validates :sport, presence: true
   validates :started_at, presence: true
   validate :power_curve_shape
