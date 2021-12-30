@@ -1,6 +1,6 @@
 class ActivitiesController < ApplicationController
   before_action :set_activity, only: %i[destroy show update snapshots]
-  before_action :authenticate_user!, only: [:create, :destroy, :snapshots]
+  before_action :authenticate_user!, except: :index
 
   def create
     nyi!
