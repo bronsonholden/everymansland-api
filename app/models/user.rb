@@ -9,6 +9,10 @@ class User < ApplicationRecord
   has_many :refresh_tokens, dependent: :destroy
   belongs_to :condition
   accepts_nested_attributes_for :condition
+  has_many :friendships, -> { accepted }
+  has_many :friends, through: :friendships
+  has_many :sent_friend_requests, -> { pending }, class_name: "Friendship"
+  has_many :received_friend_requests, -> { pending }, class_name: "Friendship", foreign_key: :friend_id
 
   has_secure_password validations: false
   validates_confirmation_of :password, if: :password_digest_changed?
