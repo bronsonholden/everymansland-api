@@ -1,21 +1,7 @@
 class ApplicationController < ActionController::API
-  def self.rescue_from(*args, **opts, &block)
-    super(*args, **opts, &block) if Rails.env.production?
-  end
-
-  rescue_from StandardError, with: :render_errors
-  rescue_from RailsParam::InvalidParameterError do |error|
-    application_error(ApplicationError.new(error.message, :unprocessable_entity))
-  end
-  rescue_from ActiveRecord::RecordInvalid do |error|
-    application_error(ApplicationError.new(error.record.errors.to_a, :unprocessable_entity))
-  end
-  rescue_from ActiveRecord::RecordNotFound do |error|
-    application_error(ApplicationError.new("#{error.model} not found", :not_found))
-  end
-  rescue_from ApplicationError, with: :application_error
-
   attr_reader :current_user
+
+  rescue_from ApplicationError, with: :application_error if Rails.env.production?
 
   protected
 
@@ -36,9 +22,9 @@ class ApplicationController < ActionController::API
 
   def authenticate_user!
     payload = jwt_payload!
-    raise ApplicationError.new("Expired access token", :unauthorized) if Time.at(payload[:exp]).past?
+    raise UnauthorizedError.new("Expired access token") if Time.at(payload[:exp]).past?
     @current_user = User.find_by(id: payload[:aud])
-    raise ApplicationError.new("Invalid access token", :unauthorized) if @current_user.nil?
+    raise UnauthorizedError.new("Invalid access token") if @current_user.nil?
   end
 
   private
@@ -46,20 +32,20 @@ class ApplicationController < ActionController::API
   def jwt!
     authorization = request.headers["Authorization"]
     res = authorization&.match(/\A[Bb]earer\s+(.+)\z/)
-    raise ApplicationError.new("No access token provided", :unauthorized) if res.nil?
+    raise UnauthorizedError.new("No access token provided") if res.nil?
     res[1]
   end
 
   def jwt_payload!
     payload = AccessToken::Decode.perform(jwt!)
-    raise ApplicationError.new("Invalid access token", :unauthorized) if payload.nil?
-    raise ApplicationError.new("Blacklisted access token", :unauthorized) if BlacklistToken.find_by(jti: payload[:jti])
+    raise UnauthorizedError.new("Invalid access token") if payload.nil?
+    raise UnauthorizedError.new("Blacklisted access token") if BlacklistToken.find_by(jti: payload[:jti])
     payload
   end
 
   def application_error(error)
     render json: {
-      error: Array.wrap(error.message).to_sentence
+      error: Array.wrap(error.messages).to_sentence
     }, status: error.status
   end
 end

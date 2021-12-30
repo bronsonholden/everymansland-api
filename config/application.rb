@@ -33,5 +33,11 @@ module EveryMansLand
     config.api_only = true
 
     config.middleware.use ActionDispatch::Cookies
+
+    config.action_dispatch.rescue_responses.merge!({
+      "ApplicationError" => :internal_server_error,
+      "NotFoundError" => :not_found,
+      "UnauthorizedError" => :unauthorized
+    })
   end
 end

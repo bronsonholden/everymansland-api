@@ -1,0 +1,1 @@
+class UnauthorizedError < ApplicationError; end
