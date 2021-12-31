@@ -1,21 +1,23 @@
 class ActivitiesController < ApplicationController
   before_action :set_activity, only: %i[destroy show update snapshots]
-  before_action :authenticate_user!, except: :index
+  before_action :authenticate_user!, except: %i[index show snapshots]
+  before_action :peek_authenticate_user!, only: %i[index show snapshots]
 
   def create
     nyi!
   end
 
   def destroy
-    nyi!
+    unless current_user.activities.where(id: @activity.id).any?
+      raise ForbiddenError.no_destroy_permission(@activity)
+    end
+
+    @activity.destroy
+
+    head :no_content
   end
 
   def index
-    begin
-      authenticate_user!
-    rescue UnauthorizedError
-    end
-
     scope = Activity::List.exec(query_params!, {
       current_user: current_user,
       for_user: nil
@@ -25,11 +27,21 @@ class ActivitiesController < ApplicationController
   end
 
   def show
+    unless Activity::List.exec(nil, {current_user: current_user}).where(id: @activity.id).any?
+      raise ForbiddenError.no_show_permission(@activity)
+    end
+
     render json: ActivityBlueprint.render(@activity), status: :ok
   end
 
   def update
-    nyi!
+    unless current_user.activities.where(id: @activity.id).any?
+      raise ForbiddenError.no_update_permission(@activity)
+    end
+
+    @activity.update!(activity_params)
+
+    render json: ActivityBlueprint.render(@activity), status: :ok
   end
 
   def snapshots
@@ -52,7 +64,11 @@ class ActivitiesController < ApplicationController
 
   def set_activity
     @activity = Activity.find(params[:id])
-  rescue ActiveRecord::RecordNotFound => e
+  rescue ActiveRecord::RecordNotFound
     raise NotFoundError.with(Activity, :id, params[:id])
+  end
+
+  def activity_params
+    params.require(:activity).permit(:started_at, :sport, :power_curve)
   end
 end
