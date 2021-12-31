@@ -1,6 +1,6 @@
 class Snapshot::List < ApplicationQuery
   param :t, Integer, range: (-1..), default: -1
-  context :current_user, User, required: true
+  context :current_user, User
   context :for_activity, Activity, required: true
 
   def resolve(params, context)
