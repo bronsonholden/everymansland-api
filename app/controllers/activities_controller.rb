@@ -8,7 +8,7 @@ class ActivitiesController < ApplicationController
 
     if activity.save
       Activity::ProcessFit.delay.perform(activity)
-      render json: ActivityBlueprint.render(activity, view: :pending), status: :accepted
+      render json: ActivityBlueprint.render(activity), status: :accepted
     else
       render json: {error: activity.errors.to_a.to_sentence}, status: :unprocessable_entity
     end
