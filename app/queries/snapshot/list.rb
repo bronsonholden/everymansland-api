@@ -1,5 +1,5 @@
 class Snapshot::List < ApplicationQuery
-  param :t, Integer, range: (-1..)
+  param :t, Integer, range: (-1..), default: -1
   context :current_user, User, required: true
   context :for_activity, Activity, required: true
 
