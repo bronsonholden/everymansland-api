@@ -3,7 +3,7 @@ class User < ApplicationRecord
   include FitConstants::Gender[:sex]
 
   before_create :set_confirmation_token, unless: :confirmation_token?
-  after_create :send_invite
+  # after_create :send_invite
 
   has_many :activities, dependent: :destroy
   has_many :refresh_tokens, dependent: :destroy
