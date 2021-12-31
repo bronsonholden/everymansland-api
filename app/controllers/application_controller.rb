@@ -18,6 +18,10 @@ class ApplicationController < ActionController::API
     head :not_implemented
   end
 
+  def peek_authenticate_user!
+    authenticate_user! if request.headers["Authorization"].present?
+  end
+
   def authenticate_user!
     payload = jwt_payload!
     raise UnauthorizedError.new("Expired access token") if Time.at(payload[:exp]).past?
