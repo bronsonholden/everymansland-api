@@ -4,7 +4,15 @@ class ActivitiesController < ApplicationController
   before_action :peek_authenticate_user!, only: %i[index show snapshots]
 
   def create
-    nyi!
+    activity = current_user.activities.build(fit: params[:fit])
+
+    if activity.save
+      Activity::ProcessFit.delay.perform(activity)
+      render json: ActivityBlueprint.render(activity, view: :pending), status: :accepted
+    else
+      render json: {error: activity.errors.to_a.to_sentence}, status: :unprocessable_entity
+    end
+
   end
 
   def destroy

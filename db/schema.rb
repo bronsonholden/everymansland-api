@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_30_024352) do
+ActiveRecord::Schema.define(version: 2021_12_31_162421) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -18,13 +18,15 @@ ActiveRecord::Schema.define(version: 2021_12_30_024352) do
 
   create_table "activities", force: :cascade do |t|
     t.bigint "condition_id"
-    t.datetime "started_at", null: false
-    t.integer "sport", null: false
+    t.datetime "started_at"
+    t.integer "sport"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "power_curve", array: true
     t.bigint "user_id", null: false
     t.integer "visibility", default: 1, null: false
+    t.text "fit_data"
+    t.integer "state", default: 0
     t.index ["condition_id"], name: "index_activities_on_condition_id"
     t.index ["user_id"], name: "index_activities_on_user_id"
   end

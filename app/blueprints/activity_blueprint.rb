@@ -9,4 +9,12 @@ class ActivityBlueprint < ApplicationBlueprint
   end
   field :power_curve
   field :sport
+
+  view :pending do
+    exclude :condition
+    exclude :power_curve
+    exclude :snapshots_url
+    exclude :sport
+    exclude :started_at
+  end
 end

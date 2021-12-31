@@ -1,0 +1,2 @@
+class FitUploader < Shrine
+end

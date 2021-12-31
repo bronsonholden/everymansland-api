@@ -1,4 +1,5 @@
 class Activity < ApplicationRecord
+  include FitUploader::Attachment(:fit)
   include FitConstants::Sport[]
 
   SUPPORTED_SPORT_TYPES = %i[
@@ -9,9 +10,8 @@ class Activity < ApplicationRecord
   ].freeze
 
   enum visibility: %i[hidden shared published]
+  enum state: %i[pending processed]
 
-  validates :sport, presence: true
-  validates :started_at, presence: true
   validate :power_curve_shape
 
   belongs_to :condition, optional: true
@@ -42,7 +42,7 @@ class Activity < ApplicationRecord
   private
 
   def power_curve_shape
-    unless power_curve.is_a?(Array) && power_curve.all? { |p| p.is_a?(Array) && p.all? { |v| v.is_a?(Integer) } }
+    unless power_curve.nil? || power_curve.is_a?(Array) && power_curve.all? { |p| p.is_a?(Array) && p.all? { |v| v.is_a?(Integer) } }
       errors.add(:power_curve, "must be an array of duration and power arrays")
     end
   end

@@ -1,10 +1,9 @@
-class Activity::BuildFromFit < ApplicationService
+class Activity::ProcessFit < ApplicationService
   attr_reader :activity
 
-  def initialize(user, io)
-    @user = user
-    @io = io
-    @activity = Activity.new(started_at: Time.now, user: user)
+  def initialize(activity)
+    @io = activity.fit.download.read
+    @activity = activity
     @records = []
   end
 
@@ -73,6 +72,7 @@ class Activity::BuildFromFit < ApplicationService
   def on_session(msg)
     @activity.started_at = Time.at(msg["start_time"])
     @activity.sport = msg["sport"]
+    @activity.state = :processed
   end
 
   def on_record(msg)
