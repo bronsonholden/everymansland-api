@@ -65,7 +65,9 @@ class ActivitiesController < ApplicationController
     render json: serialize_collection(
       snapshots.limit(paging[:limit]),
       paged: false
-    ), status: :ok
+    ).merge({
+      remaining: snapshots.count
+    }), status: :ok
   end
 
   private

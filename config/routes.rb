@@ -11,6 +11,7 @@ Rails.application.routes.draw do
     resource :cycling do
       get :"power-curve", on: :collection
       get :"critical-power", on: :collection
+      get :activities, on: :collection
     end
   end
 

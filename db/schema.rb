@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_31_162421) do
+ActiveRecord::Schema.define(version: 2022_01_01_011833) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -27,6 +27,23 @@ ActiveRecord::Schema.define(version: 2021_12_31_162421) do
     t.integer "visibility", default: 1, null: false
     t.text "fit_data"
     t.integer "state", default: 0
+    t.float "distance"
+    t.integer "elevation_gain"
+    t.integer "elevation_loss"
+    t.integer "calories_burned"
+    t.float "average_speed"
+    t.float "max_speed"
+    t.integer "average_power"
+    t.integer "max_power"
+    t.integer "average_heart_rate"
+    t.integer "max_heart_rate"
+    t.integer "average_cadence"
+    t.integer "max_cadence"
+    t.integer "elapsed_time"
+    t.integer "moving_time"
+    t.integer "cycling_normalized_power"
+    t.float "cycling_training_stress_score"
+    t.float "cycling_intensity_factor"
     t.index ["condition_id"], name: "index_activities_on_condition_id"
     t.index ["user_id"], name: "index_activities_on_user_id"
   end

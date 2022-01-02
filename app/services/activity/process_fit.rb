@@ -73,6 +73,23 @@ class Activity::ProcessFit < ApplicationService
     @activity.started_at = Time.at(msg["start_time"])
     @activity.sport = msg["sport"]
     @activity.state = :processed
+    @activity.distance = msg.fetch_by("total_distance", &:m)
+    @activity.elevation_gain = msg["total_ascent"]
+    @activity.elevation_loss = msg["total_descent"]
+    @activity.calories_burned = msg["total_calories"]
+    @activity.average_speed = msg["avg_speed"] * 3.6
+    @activity.max_speed = msg["max_speed"] * 3.6
+    @activity.average_power = msg["avg_power"]
+    @activity.max_power = msg["max_power"]
+    @activity.average_heart_rate = msg["avg_heart_rate"]
+    @activity.max_heart_rate = msg["max_heart_rate"]
+    @activity.average_cadence = msg["avg_cadence"]
+    @activity.max_cadence = msg["max_cadence"]
+    @activity.elapsed_time = msg["total_elapsed_time"].floor
+    @activity.moving_time = msg["total_timer_time"].floor
+    @activity.cycling_normalized_power = msg["normalized_power"]
+    @activity.cycling_training_stress_score = msg["training_stress_score"]
+    @activity.cycling_intensity_factor = msg["intensity_factor"]
   end
 
   def on_record(msg)
