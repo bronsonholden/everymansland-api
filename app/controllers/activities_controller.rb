@@ -79,6 +79,11 @@ class ActivitiesController < ApplicationController
   end
 
   def activity_params
-    params.require(:activity).permit(:started_at, :sport, :power_curve)
+    params.require(:activity).permit(
+      :power_curve,
+      :started_at,
+      :sport,
+      :visibility
+    )
   end
 end
