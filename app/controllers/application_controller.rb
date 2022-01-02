@@ -47,7 +47,7 @@ class ApplicationController < ActionController::API
 
     {
       "#{scope.table_name}": blueprint.render_as_hash(scope),
-      total: scope.offset(nil).limit(nil).count,
+      total: (scope.offset(nil).limit(nil).count if paged),
       page: (paging[:page] if paged)
     }.compact
   end
