@@ -15,6 +15,6 @@ class ApplicationError < StandardError
   end
 
   def to_s
-    Array.wrap(messages).to_sentence
+    Array.wrap(messages).to_sentence.capitalize
   end
 end
