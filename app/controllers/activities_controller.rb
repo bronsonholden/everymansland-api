@@ -6,12 +6,15 @@ class ActivitiesController < ApplicationController
   def create
     activity = current_user.activities.build(fit: params[:fit])
 
-    if activity.save
-      Activity::ProcessFit.delay.perform(activity)
-      render json: ActivityBlueprint.render(activity), status: :accepted
-    else
-      render json: {error: activity.errors.to_a.to_sentence}, status: :unprocessable_entity
+    begin
+      activity.save!
+    rescue ActiveRecord::RecordInvalid => e
+      raise UnprocessableEntityError.from_record_invalid(e)
     end
+
+    Activity::ProcessFit.delay.perform(activity)
+
+    render json: ActivityBlueprint.render(activity), status: :accepted
 
   end
 
@@ -47,7 +50,25 @@ class ActivitiesController < ApplicationController
       raise ForbiddenError.no_update_permission(@activity)
     end
 
-    @activity.update!(activity_params)
+    Parameter::Validate.perform(
+      activity_params.slice(:sport),
+      :sport,
+      String,
+      in: Activity::SUPPORTED_SPORT_TYPES.map(&:to_s)
+    )
+
+    Parameter::Validate.perform(
+      activity_params.slice(:visibility),
+      :visibility,
+      String,
+      in: Activity.visibilities.keys
+    )
+
+    begin
+      @activity.update!(activity_params)
+    rescue ActiveRecord::RecordInvalid => e
+      raise UnprocessableEntityError.from_record_invalid(e)
+    end
 
     render json: ActivityBlueprint.render(@activity), status: :ok
   end
@@ -79,11 +100,18 @@ class ActivitiesController < ApplicationController
   end
 
   def activity_params
-    params.require(:activity).permit(
-      :power_curve,
+    @activity_params ||= params.require(:activity).permit(
       :started_at,
       :sport,
-      :visibility
-    )
+      :visibility,
+      power_curve: [[]] # to squelch unpermitted param warning
+    ).merge(power_curve_params)
+  end
+
+  def power_curve_params
+    # Workaround to permit array of arrays
+    ActionController::Parameters.new(
+      power_curve: request.parameters[:power_curve]
+    ).compact.permit!
   end
 end
