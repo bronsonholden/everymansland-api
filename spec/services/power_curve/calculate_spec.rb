@@ -30,16 +30,40 @@ describe PowerCurve::Calculate do
     it { is_expected.to include([1.hour, 150], [30.minutes, 200]) }
   end
 
-  context "profile with pause" do
+  context "power after pause" do
     let(:duration) { [1.hour, 20.minutes, 30.minutes] }
     let(:profile) {
       generate_power_profile(1.hour) do |t|
-        t >= 20.minutes && t < 40.minutes ? nil : 180
+        if t < 20.minutes
+          90
+        elsif t < 40.minutes
+          nil
+        else
+          180
+        end
       end
     }
 
     # 30 minute power should be 120 (20 minutes at 180, 10 at zero)
-    it { is_expected.to include([1.hour, 120], [20.minutes, 180], [30.minutes, 120]) }
+    it { is_expected.to include([1.hour, 90], [20.minutes, 180], [30.minutes, 120]) }
+  end
+
+  context "power before pause" do
+    let(:duration) { [1.hour, 20.minutes, 30.minutes] }
+    let(:profile) {
+      generate_power_profile(1.hour) do |t|
+        if t < 20.minutes
+          180
+        elsif t < 40.minutes
+          nil
+        else
+          90
+        end
+      end
+    }
+
+    # 30 minute power should be 120 (20 minutes at 180, 10 at zero)
+    it { is_expected.to include([1.hour, 90], [20.minutes, 180], [30.minutes, 120]) }
   end
 
   # Bit of an edge case, but you never know

@@ -62,6 +62,11 @@ class PowerCurve::Calculate < ApplicationService
       right += 1
     end
 
+    avg = power.to_f / duration
+    if avg > max
+      max = avg
+    end
+
     max.round
   end
 end
