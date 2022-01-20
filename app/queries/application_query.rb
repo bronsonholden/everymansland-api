@@ -62,6 +62,6 @@ class ApplicationQuery
     end
     result
   rescue UnprocessableEntityError => e
-    fail ApplicationError.new("Invalid query context provided: #{e.message}")
+    raise ApplicationError.new("Invalid query context provided: #{e.message}")
   end
 end
