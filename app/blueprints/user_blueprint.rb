@@ -8,4 +8,8 @@ class UserBlueprint < ApplicationBlueprint
   end
   field :first_name
   field :last_name
+
+  view :friend do
+    exclude :condition
+  end
 end

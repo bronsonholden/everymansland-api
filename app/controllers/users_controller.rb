@@ -1,4 +1,7 @@
 class UsersController < ApplicationController
+  before_action :authenticate_user!, only: %i[add_friend friends remove_friend]
+  before_action :set_user, only: %i[add_friend friends remove_friend]
+
   def index
     users = User.all
 
@@ -23,6 +26,19 @@ class UsersController < ApplicationController
     nyi!
   end
 
+  def add_friend
+    current_user.friendships.first_or_create!(friend: @user)
+    head :no_content
+  end
+
+  def remove_friend
+    begin
+      Friendship.find_by!(user: current_user, friend: @user).breakup
+    rescue ActiveRecord::RecordNotFound => e
+      raise NotFoundError.with(Friendship, :friend_id, @user.id)
+    end
+  end
+
   def activities
     begin
       authenticate_user!
@@ -41,5 +57,15 @@ class UsersController < ApplicationController
     })
 
     render json: serialize_collection(scope), status: :ok
+  end
+
+  private
+
+  def set_user
+    begin
+      @user = User.find(params[:id])
+    rescue ActiveRecord::RecordNotFound => e
+      raise NotFoundError.with(User, :id, params[:id])
+    end
   end
 end

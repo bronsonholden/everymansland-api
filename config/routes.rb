@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
-  # Handy override that prevents PUT routes from being created
+  # Handy override that prevents PUT routes from being automatically created.
+  alias put! put
   def put(*)
   end
 
@@ -18,9 +19,12 @@ Rails.application.routes.draw do
   resource :session, controller: :session, only: %w[create update destroy]
   resources :users do
     get :activities, on: :member
+    put! :friend, on: :member, to: "users#add_friend"
+    delete :friend, on: :member, to: "users#remove_friend"
   end
   resource :user, controller: :authenticated_user, only: %w[show update] do
     resource :avatar, controller: :avatar, only: %w[show update]
     get :activities, on: :member
+    get :friends, on: :member
   end
 end

@@ -54,7 +54,7 @@ class Friendship < ApplicationRecord
   def self.makeup(user, friend)
     Friendship.transaction do
       friendship = Friendship.create(user: user, friend: friend)
-      friendship && !!friendship.accept
+      friendship.persisted? && !!friendship.accept
     end
   end
 end

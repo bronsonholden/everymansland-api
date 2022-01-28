@@ -23,6 +23,13 @@ class AuthenticatedUserController < ApplicationController
     render json: serialize_collection(scope), status: :ok
   end
 
+  def friends
+    render json: serialize_collection(
+      current_user.friends,
+      view: :friend
+    ), status: :ok
+  end
+
   private
 
   def user_params
