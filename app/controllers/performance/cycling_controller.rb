@@ -16,7 +16,6 @@ class Performance::CyclingController < ApplicationController
 
     props = {
       average_cadence: "sum(activities.average_cadence * activities.moving_time) / sum(activities.moving_time)",
-      average_calories_burned: "sum(activities.calories_burned * activities.moving_time) / sum(activities.moving_time)",
       average_heart_rate: "sum(activities.average_heart_rate * activities.moving_time) / sum(activities.moving_time)",
       average_normalized_power: "sum(activities.cycling_normalized_power * activities.moving_time) / sum(activities.moving_time)",
       average_power: "sum(activities.average_power * activities.moving_time) / sum(activities.moving_time)",
