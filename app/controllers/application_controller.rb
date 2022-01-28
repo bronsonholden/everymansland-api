@@ -29,7 +29,7 @@ class ApplicationController < ActionController::API
     raise UnauthorizedError.new("Invalid access token") if @current_user.nil?
   end
 
-  def serialize_collection(scope, paged: true)
+  def serialize_collection(scope, paged: true, **opts)
     scope = if paged
       paging = params.permit!.to_h.symbolize_keys.slice(:page, :limit)
       Parameter::Validate.perform(paging, :page, Integer, range: (1..), default: 1)
@@ -46,7 +46,7 @@ class ApplicationController < ActionController::API
     end
 
     {
-      "#{scope.table_name}": blueprint.render_as_hash(scope),
+      "#{scope.table_name}": blueprint.render_as_hash(scope, opts),
       total: (scope.offset(nil).limit(nil).count if paged),
       page: (paging[:page] if paged)
     }.compact
