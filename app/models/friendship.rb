@@ -1,7 +1,6 @@
 # Everybody needs friends
 class Friendship < ApplicationRecord
-  validates :user, presence: true, uniqueness: {scope: :friend_id}
-  validates :friend, presence: true, uniqueness: {scope: :user_id}
+  validate :friendship_uniqueness
 
   belongs_to :user
   belongs_to :friend, class_name: "User"
@@ -14,11 +13,18 @@ class Friendship < ApplicationRecord
     reciprocated(true)
   }
 
+  scope :between, ->(user, friend) {
+    where(
+      user: user,
+      friend: friend
+    ).or(Friendship.where(user: friend, friend: user))
+  }
+
   scope :reciprocated, ->(reciprocated) {
     where(
       <<-SQL
         #{reciprocated ? "" : "not"} exists (
-          select *
+          select 1 as one
           from friendships as reciprocal_friendships
           where
             reciprocal_friendships.user_id = friendships.friend_id
@@ -37,7 +43,11 @@ class Friendship < ApplicationRecord
   end
 
   def accept!
-    reciprocal.first_or_create!
+    begin
+      reciprocal.first_or_create!
+    rescue ActiveRecord::RecordNotUnique
+      retry
+    end
   end
 
   def reciprocal
@@ -46,15 +56,23 @@ class Friendship < ApplicationRecord
 
   def breakup
     Friendship.transaction do
-      self.destroy
+      self.destroy if persisted?
       reciprocal.destroy_all
     end
   end
 
-  def self.makeup(user, friend)
+  def self.makeup!(user, friend)
     Friendship.transaction do
-      friendship = Friendship.create(user: user, friend: friend)
-      friendship.persisted? && !!friendship.accept
+      friendship = Friendship.create!(user: user, friend: friend)
+      friendship.accept!
+    end
+  end
+
+  private
+
+  def friendship_uniqueness
+    if Friendship.where(user: user, friend: friend).any?
+      errors.add(:base, "You are already friends with this user")
     end
   end
 end

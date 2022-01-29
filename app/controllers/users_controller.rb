@@ -1,6 +1,18 @@
 class UsersController < ApplicationController
-  before_action :authenticate_user!, only: %i[add_friend friends remove_friend]
-  before_action :set_user, only: %i[add_friend friends remove_friend]
+  before_action :authenticate_user!, only: %i[
+    add_friend
+    friends
+    friend_requests
+    remove_friend
+  ]
+  before_action :set_user, only: %i[
+    activities
+    add_friend
+    friends
+    friend_requests
+    remove_friend
+    show
+  ]
 
   def index
     users = User.all
@@ -9,13 +21,7 @@ class UsersController < ApplicationController
   end
 
   def show
-    user = begin
-      User.find(params[:id])
-    rescue ActiveRecord::RecordNotFound
-      raise NotFoundError.with(User, :id, params[:id])
-    end
-
-    render json: UserBlueprint.render_as_hash(user), status: :ok
+    render json: UserBlueprint.render_as_hash(@user), status: :ok
   end
 
   def create
@@ -27,16 +33,20 @@ class UsersController < ApplicationController
   end
 
   def add_friend
-    current_user.friendships.first_or_create!(friend: @user)
+    begin
+      Friendship.where(user: current_user, friend: @user).first_or_create!
+    rescue ActiveRecord::RecordInvalid => e
+      # In case additional validations beyond uniquness are added
+      raise UnprocessableEntityError.from_record_invalid(e)
+    end
+
     head :no_content
   end
 
   def remove_friend
-    begin
-      Friendship.find_by!(user: current_user, friend: @user).breakup
-    rescue ActiveRecord::RecordNotFound => e
-      raise NotFoundError.with(Friendship, :friend_id, @user.id)
-    end
+    Friendship.between(current_user, @user).first&.breakup
+
+    head :no_content
   end
 
   def activities
@@ -45,15 +55,9 @@ class UsersController < ApplicationController
     rescue UnauthorizedError
     end
 
-    user = begin
-      User.find(params[:id])
-    rescue ActiveRecord::RecordNotFound => e
-      raise NotFoundError.with(User, :id, user_id)
-    end
-
     scope = Activity::List.exec(query_params!, {
       current_user: current_user,
-      for_user: user
+      for_user: @user
     })
 
     render json: serialize_collection(scope), status: :ok

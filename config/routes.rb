@@ -26,5 +26,7 @@ Rails.application.routes.draw do
     resource :avatar, controller: :avatar, only: %w[show update]
     get :activities, on: :member
     get :friends, on: :member
+    get :"friend-requests", on: :member
   end
+  resources :friendships, only: :index
 end

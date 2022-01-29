@@ -30,7 +30,7 @@ class UnprocessableEntityError < ApplicationError
   def self.from_record_invalid(error)
     new(error.record.errors.attribute_names.map do |attribute|
       error.record.errors.messages_for(attribute).map do |message|
-        "attribute '#{attribute}' #{message}"
+        "#{attribute != :base ? "attribute '#{attribute}' " : ""}#{message}"
       end
     end.flatten)
   end

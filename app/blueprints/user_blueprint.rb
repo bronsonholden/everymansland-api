@@ -10,6 +10,7 @@ class UserBlueprint < ApplicationBlueprint
   field :last_name
 
   view :friend do
+    exclude :activities_url
     exclude :condition
   end
 end

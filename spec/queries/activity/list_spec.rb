@@ -27,7 +27,7 @@ describe Activity::List do
     end
 
     before(:each) do
-      assert Friendship.makeup(user, friend)
+      Friendship.makeup!(user, friend)
     end
 
     it { is_expected.to contain_exactly(published_activity, shared_activity) }

@@ -30,6 +30,10 @@ class AuthenticatedUserController < ApplicationController
     ), status: :ok
   end
 
+  def friend_requests
+    render json: serialize_collection(current_user.received_friend_requests), status: :ok
+  end
+
   private
 
   def user_params
