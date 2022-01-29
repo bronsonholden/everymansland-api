@@ -96,7 +96,7 @@ class ActivitiesController < ApplicationController
   def set_activity
     @activity = Activity.find(params[:id])
   rescue ActiveRecord::RecordNotFound
-    raise NotFoundError.with(Activity, :id, params[:id])
+    raise NotFoundError.record_with_attribute_value(Activity, :id, params[:id])
   end
 
   def activity_params

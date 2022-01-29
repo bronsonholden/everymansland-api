@@ -1,4 +1,5 @@
 class UsersController < ApplicationController
+  before_action :peek_authenticate_user, only: :activities
   before_action :authenticate_user!, only: %i[
     add_friend
     friends
@@ -50,11 +51,6 @@ class UsersController < ApplicationController
   end
 
   def activities
-    begin
-      authenticate_user!
-    rescue UnauthorizedError
-    end
-
     scope = Activity::List.exec(query_params!, {
       current_user: current_user,
       for_user: @user
@@ -66,10 +62,8 @@ class UsersController < ApplicationController
   private
 
   def set_user
-    begin
-      @user = User.find(params[:id])
-    rescue ActiveRecord::RecordNotFound => e
-      raise NotFoundError.with(User, :id, params[:id])
-    end
+    @user = User.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    raise NotFoundError.record_with_attribute_value(User, :id, params[:id])
   end
 end

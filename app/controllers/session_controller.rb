@@ -4,8 +4,12 @@ class SessionController < ApplicationController
   before_action :authenticate_user!, only: :destroy
 
   def create
-    user = User.find_by(email: session_params[:email])
-    raise NotFoundError.with(User, :email, session_params[:email]) unless user.present?
+    begin
+      user = User.find_by!(email: session_params[:email])
+    rescue ActiveRecord::RecordNotFound
+      raise NotFoundError.record_with_attribute_value(User, :email, session_params[:email])
+    end
+
     unless user.password_digest? && user.authenticate(session_params[:password])
       raise UnauthorizedError.new("Incorrect password")
     end
