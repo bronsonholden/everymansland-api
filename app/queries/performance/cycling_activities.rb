@@ -1,5 +1,5 @@
 class Performance::CyclingActivities < ApplicationQuery
-  param :group, String, in: %w[week month year]
+  param :group, String, in: %w[day week month year]
   context :current_user, User, required: true
 
   def resolve(params, context)

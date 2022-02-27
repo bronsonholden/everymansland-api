@@ -5,13 +5,8 @@ class Friendship < ApplicationRecord
   belongs_to :user
   belongs_to :friend, class_name: "User"
 
-  scope :pending, -> {
-    reciprocated(false)
-  }
-
-  scope :accepted, -> {
-    reciprocated(true)
-  }
+  scope :pending, -> { reciprocated(false) }
+  scope :accepted, -> { reciprocated(true) }
 
   scope :between, ->(user, friend) {
     where(
@@ -71,8 +66,12 @@ class Friendship < ApplicationRecord
   private
 
   def friendship_uniqueness
-    if Friendship.where(user: user, friend: friend).any?
+    existing = Friendship.where(user: user, friend: friend).first
+    return if existing.blank?
+    if existing.accepted?
       errors.add(:base, "You are already friends with this user")
+    else
+      errors.add(:base, "You have already sent this user a friend request")
     end
   end
 end
