@@ -40,22 +40,26 @@ class PowerCurve::Calculate < ApplicationService
 
     while right < @profile.size
       current = @profile[right]
-      t += current[:dt]
-      power += current[:power]
-      while t > duration
-        # Before we walk left edge, do a power calculation first
-        # so we aren't ignoring readings < `duration` seconds before a gap
+      peek = @profile[right + 1]
+
+      # Do a power calculation before overshooting duration & walking the
+      # left edge back up
+      if peek.present? && t + peek[:dt] > duration
         avg = power.to_f / duration
         if avg > max
           max = avg
         end
+      end
+
+      t += current[:dt]
+      power += current[:power]
+
+      while t > duration
         t -= @profile[left][:dt]
         power -= @profile[left][:power]
         left += 1
-      end
-      if t == duration
         avg = power.to_f / duration
-        if avg > max
+        if t <= duration && avg > max
           max = avg
         end
       end
@@ -63,7 +67,7 @@ class PowerCurve::Calculate < ApplicationService
     end
 
     avg = power.to_f / duration
-    if avg > max
+    if t <= duration && avg > max
       max = avg
     end
 
