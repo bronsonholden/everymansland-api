@@ -101,9 +101,10 @@ class Activity::ProcessFit < ApplicationService
       altitude: msg["altitude"],
       cumulative_distance: msg.fetch_by("distance", &:m), # meters
       heart_rate: msg["heart_rate"],
-      speed: msg["speed"] * 3.6, # meters per second
+      speed: msg["speed"].present? ? msg["speed"] * 3.6 : nil, # meters per second
       cadence: msg["cadence"],
-      temperature: msg["temperature"]
+      temperature: msg["temperature"],
+      location: nil
     }
 
     # If both latitude and longitude are present
