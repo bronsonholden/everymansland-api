@@ -23,20 +23,19 @@ class Activity < ApplicationRecord
   # aggregates e.g. `group("reading.duration").maximum("reading.power")`
   # for best critical power.
   scope :unnest_power_curve, -> {
-    select("activities.*")
-    .joins(
+    joins(
       <<-SQL
         left join (
           select id, duration, power
           from
-          activities as inner_activities,
+            activities as inner_activities,
             unnest(
               inner_activities.power_curve[:][1:1],
               inner_activities.power_curve[:][2:2]
             ) as x(duration, power)
         ) as reading on reading.id = activities.id
       SQL
-    )
+    ).reselect("activities.*", "reading.power", "reading.duration")
   }
 
   private
