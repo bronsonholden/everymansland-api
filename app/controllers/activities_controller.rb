@@ -85,7 +85,8 @@ class ActivitiesController < ApplicationController
 
     render json: serialize_collection(
       snapshots.limit(paging[:limit]),
-      paged: false
+      paged: false,
+      view: @activity.sport
     ).merge({
       remaining: snapshots.count
     }), status: :ok
