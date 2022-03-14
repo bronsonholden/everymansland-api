@@ -81,7 +81,7 @@ class ActivitiesController < ApplicationController
 
     # Snapshots are cursor-paged, so we only need to apply limit
     paging = params.permit!.to_h.symbolize_keys.slice(:limit)
-    Parameter::Validate.perform(paging, :limit, Integer, range: (1..100), default: 25)
+    Parameter::Validate.perform(paging, :limit, Integer, range: (1..500), default: 100)
 
     render json: serialize_collection(
       snapshots.limit(paging[:limit]),
