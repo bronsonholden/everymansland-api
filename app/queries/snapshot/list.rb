@@ -12,6 +12,6 @@ class Snapshot::List < ApplicationQuery
       raise ForbiddenError.no_show_permission(for_activity)
     end
 
-    for_activity.snapshots.where("t > ?", params[:t])
+    for_activity.snapshots.order(t: :asc).where("t > ?", params[:t])
   end
 end
