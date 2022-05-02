@@ -38,6 +38,67 @@ class Activity < ApplicationRecord
     ).reselect("activities.*", "reading.power", "reading.duration")
   }
 
+  scope :best_power_curve, -> {
+    grouped = group_by_week(:started_at)
+    epoch_clause = grouped.group_values.first.gsub("activities", "inner_activities")
+    joins(
+      <<-SQL
+      left join (
+        select id, #{epoch_clause} as epoch, duration, power
+        from
+          activities as inner_activities,
+          unnest(
+            inner_activities.power_curve[:][1:1],
+            inner_activities.power_curve[:][2:2]
+          ) as x(duration, power)
+      ) as reading on reading.id = activities.id
+
+      left join (
+        select id, #{epoch_clause} as epoch, duration, power
+        from
+          activities as inner_activities,
+          unnest(
+            inner_activities.power_curve[:][1:1],
+            inner_activities.power_curve[:][2:2]
+          ) as x(duration, power)
+      ) as compare
+        on
+          reading.epoch = compare.epoch
+          and reading.duration = compare.duration
+          and reading.power < compare.power
+      SQL
+    ).where("compare.power is null")
+  }
+
+  scope :best_power_curve2, -> {
+    scope = joins(
+      <<-SQL
+        left join (
+          select id, duration, power
+          from
+            activities as inner_activities,
+            unnest(
+              inner_activities.power_curve[:][1:1],
+              inner_activities.power_curve[:][2:2]
+            ) as x(duration, power)
+        ) as reading on reading.id = activities.id
+
+        left join (
+          select id, duration, power
+          from
+            activities as inner_activities,
+            unnest(
+              inner_activities.power_curve[:][1:1],
+              inner_activities.power_curve[:][2:2]
+            ) as x(duration, power)
+        ) as compare on reading.duration = compare.duration and reading.power < compare.power
+      SQL
+    ).where("compare.power is null")
+
+    scope
+      .reselect("activities.*, reading.power, reading.duration, #{scope.group_values.first} as epoch")
+  }
+
   private
 
   def power_curve_shape

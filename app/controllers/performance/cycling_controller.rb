@@ -6,7 +6,16 @@ class Performance::CyclingController < ApplicationController
   end
 
   def power_curve
-    nyi!
+    result = Performance::CyclingPowerCurve.exec(query_params!, {
+      current_user: current_user
+    })
+
+    payload = result.to_a.group_by(&:epoch).map do |epoch, items|
+      data = ActivityBlueprint.render_as_hash(items, view: :power_curve)
+      { epoch: epoch, power_curve: data }
+    end
+
+    render json: { power_curves: payload }, status: :ok
   end
 
   def activities

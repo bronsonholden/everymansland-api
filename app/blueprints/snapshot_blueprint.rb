@@ -17,5 +17,6 @@ class SnapshotBlueprint < ApplicationBlueprint
     field :cadence
     field :heart_rate
     field :power
+    field :cumulative_distance
   end
 end
