@@ -10,7 +10,7 @@ class Parameter::Validate < ApplicationService
 
   def perform
     params[name] = params[name].to_s if params[name].is_a?(Symbol)
-    params[name] ||= options[:default] if options[:default]
+    params[name] = options[:default] if options.key?(:default) && !params.key?(name)
 
     if options[:required]
       raise UnprocessableEntityError.parameter_missing_error(name) unless params[name].present?
