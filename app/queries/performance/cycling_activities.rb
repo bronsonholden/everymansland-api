@@ -1,3 +1,7 @@
+# Retrieve cycling activities for `current_user` with optional grouping by
+# day, week, month, or year.
+#
+# Returns an ActiveRecord relation with grouping applied, if requested.
 class Performance::CyclingActivities < ApplicationQuery
   param :group, String, in: %w[day week month year]
   context :current_user, User, required: true

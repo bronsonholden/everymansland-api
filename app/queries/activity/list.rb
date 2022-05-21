@@ -1,3 +1,8 @@
+# Retrieve all activities uploaded by the target user (`for_user`), subject
+# to permissions of `current_user`. If `current_user` is nil, only published
+# activities are available.
+#
+# Returns an ActiveRecord relation with sorting applied, if requesting.
 class Activity::List < ApplicationQuery
   param :sort, String, in: %w[created_at started_at], default: "created_at"
   param :direction, String, in: %w[asc desc], default: "asc"
